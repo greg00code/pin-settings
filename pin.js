@@ -1,18 +1,15 @@
+// PIN Protection for Bubble.io
 (function() {
     class BubblePinProtection {
         constructor(options = {}) {
-             this.containerId = options.containerId || 'settings-gate';
-            this.container = document.getElementById(this.containerId) || document.createElement('div');
+            this.container = options.container || document.createElement('div');
             this.password = options.password || '1234';
-            this.onUnlock = options.onUnlock || function(){};
-            this.onFailure = options.onFailure || function(){};
             this.initialize();
         }
 
         initialize() {
-             // Création du HTML pour le PIN uniquement
-             this.pinElement = document.createElement('div')
-            this.pinElement.innerHTML = `
+            // Création du HTML pour le PIN uniquement
+            this.container.innerHTML = `
                 <div style="padding: 20px; max-width: 300px; margin: auto; text-align: center;">
                     <h3 style="margin-bottom: 20px;">Accès Protégé</h3>
                     <div>
@@ -29,29 +26,40 @@
                     <div id="error-msg" style="color: red; margin-top: 10px; display: none;"></div>
                 </div>
             `;
-             this.container.appendChild(this.pinElement)
 
             // Ajout des événements
-            const button = this.pinElement.querySelector('#unlock-btn');
-            const input = this.pinElement.querySelector('#pin-input');
-            const errorMsg = this.pinElement.querySelector('#error-msg');
+            const button = this.container.querySelector('#unlock-btn');
+            const input = this.container.querySelector('#pin-input');
+            const errorMsg = this.container.querySelector('#error-msg');
 
             const tryUnlock = () => {
                 if (input.value === this.password) {
                     errorMsg.style.color = 'green';
                     errorMsg.textContent = 'Accès autorisé !';
                     errorMsg.style.display = 'block';
-                      // Appel du callback onUnlock()
-                    this.onUnlock();
-
+                    
+                    // Déclencher le workflow Bubble
+                    if (window.bubble) {
+                        bubble.triggerWorkflow('unlock_settings');
+                        
+                        // Manipulation directe des groupes avec les noms exacts
+                        const settingsLock = document.querySelector('[bubble-element="Group Settings_Lock"]');
+                        const settingsContent = document.querySelector('[bubble-element="Group Settings_Content"]');
+                        
+                        if (settingsLock) {
+                            settingsLock.style.display = 'none';
+                            console.log('Groupe verrouillage masqué');
+                        }
+                        if (settingsContent) {
+                            settingsContent.style.display = 'block';
+                            console.log('Groupe contenu affiché');
+                        }
+                    }
                 } else {
-                   input.value = '';
-                   errorMsg.style.color = 'red';
-                   errorMsg.textContent = 'Code PIN incorrect';
+                    input.value = '';
+                    errorMsg.style.color = 'red';
+                    errorMsg.textContent = 'Code PIN incorrect';
                     errorMsg.style.display = 'block';
-                      // Appel du callback onFailure()
-                    this.onFailure();
-
                 }
             };
 
