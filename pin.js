@@ -1,17 +1,18 @@
 (function() {
     class BubblePinProtection {
         constructor(options = {}) {
-            this.container = options.container || document.createElement('div');
+             this.containerId = options.containerId || 'settings-gate';
+            this.container = document.getElementById(this.containerId) || document.createElement('div');
             this.password = options.password || '1234';
             this.onUnlock = options.onUnlock || function(){};
             this.onFailure = options.onFailure || function(){};
-            this.containerId = options.containerId || 'settings-gate'
             this.initialize();
         }
 
         initialize() {
-            // Création du HTML pour le PIN uniquement
-            this.container.innerHTML = `
+             // Création du HTML pour le PIN uniquement
+             this.pinElement = document.createElement('div')
+            this.pinElement.innerHTML = `
                 <div style="padding: 20px; max-width: 300px; margin: auto; text-align: center;">
                     <h3 style="margin-bottom: 20px;">Accès Protégé</h3>
                     <div>
@@ -28,10 +29,12 @@
                     <div id="error-msg" style="color: red; margin-top: 10px; display: none;"></div>
                 </div>
             `;
+             this.container.appendChild(this.pinElement)
+
             // Ajout des événements
-            const button = this.container.querySelector('#unlock-btn');
-            const input = this.container.querySelector('#pin-input');
-            const errorMsg = this.container.querySelector('#error-msg');
+            const button = this.pinElement.querySelector('#unlock-btn');
+            const input = this.pinElement.querySelector('#pin-input');
+            const errorMsg = this.pinElement.querySelector('#error-msg');
 
             const tryUnlock = () => {
                 if (input.value === this.password) {
