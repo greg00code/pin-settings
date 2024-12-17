@@ -1,2 +1,1 @@
-// Test file
-console.log('Hello World');
+Y2xhc3MgUGluUHJvdGVjdGlvbiB7CiAgICBjb25zdHJ1Y3RvcigpIHt9Cn0=
