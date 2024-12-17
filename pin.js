@@ -1,9 +1,11 @@
-// PIN Protection for Bubble.io
 (function() {
     class BubblePinProtection {
         constructor(options = {}) {
             this.container = options.container || document.createElement('div');
             this.password = options.password || '1234';
+            this.onUnlock = options.onUnlock || function(){};
+            this.onFailure = options.onFailure || function(){};
+            this.containerId = options.containerId || 'settings-gate'
             this.initialize();
         }
 
@@ -26,7 +28,6 @@
                     <div id="error-msg" style="color: red; margin-top: 10px; display: none;"></div>
                 </div>
             `;
-
             // Ajout des événements
             const button = this.container.querySelector('#unlock-btn');
             const input = this.container.querySelector('#pin-input');
@@ -37,16 +38,17 @@
                     errorMsg.style.color = 'green';
                     errorMsg.textContent = 'Accès autorisé !';
                     errorMsg.style.display = 'block';
-                    
-                    // Déclencher le workflow Bubble
-                    if (window.bubble) {
-                        bubble.triggerWorkflow('unlock_settings');
-                    }
+                      // Appel du callback onUnlock()
+                    this.onUnlock();
+
                 } else {
-                    input.value = '';
-                    errorMsg.style.color = 'red';
-                    errorMsg.textContent = 'Code PIN incorrect';
+                   input.value = '';
+                   errorMsg.style.color = 'red';
+                   errorMsg.textContent = 'Code PIN incorrect';
                     errorMsg.style.display = 'block';
+                      // Appel du callback onFailure()
+                    this.onFailure();
+
                 }
             };
 
